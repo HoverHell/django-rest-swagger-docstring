@@ -24,7 +24,7 @@ if sys.argv[-1] == 'publish':
 
 README = """
 Django REST Swagger docstrings
-Supports docstrings in Django Rest Swagger in version >2.0
+Supports docstrings in Django Rest Swagger for versions >2.0
 Installation
 From pip:
 pip install django-rest-swagger-docstring
@@ -47,7 +47,7 @@ setup(
     packages=['django_rest_swagger_docstring'],
     include_package_data=True,
     license='MIT License',
-    description='Supports docstrings in Django Rest Swagger in version >2.0',
+    description='Supports docstrings in Django Rest Swagger for versions >2.0',
     long_description=README,
     test_suite='tests',
     author='Jan Romaniak',

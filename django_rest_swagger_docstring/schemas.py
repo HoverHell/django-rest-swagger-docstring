@@ -25,9 +25,7 @@ types_lookup = ClassLookupDict({
 
 class DocsSchemaGenerator(SchemaGenerator):
     def get_link(self, path, method, view):
-        """
-        Return a `coreapi.Link` instance for the given endpoint.
-        """
+        """ Return a `coreapi.Link` instance for the given endpoint. """
         fields = self.get_path_fields(path, method, view)
         fields += self.get_serializer_fields(path, method, view)
         fields += self.get_pagination_fields(path, method, view)
@@ -56,9 +54,7 @@ class DocsSchemaGenerator(SchemaGenerator):
         )
 
     def get_docs_fields(self, path, method, view):
-        """
-        Return a `coreapi.Fields array` instance from docstrings
-        """
+        """ Return a `coreapi.Fields array` instance from docstrings """
         method_name = getattr(view, 'action', method.lower())
         method_docstring = getattr(view, method_name, None).__doc__
         docs = str(method_docstring)
@@ -71,7 +67,7 @@ class DocsSchemaGenerator(SchemaGenerator):
             coreapi_fields.append(coreapi.Field(name=parameter.get('name'),
                                                 required=parameter.get('required'),
                                                 location=parameter.get('param_type'),
-                                                type=parameter.get('type')))
+                                                type=parameter.get('data_type')))
         return coreapi_fields
 
     def has_view_permissions(self, path, method, view):
