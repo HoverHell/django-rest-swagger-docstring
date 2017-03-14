@@ -26,11 +26,26 @@ types_lookup = ClassLookupDict({
 class DocsSchemaGenerator(SchemaGenerator):
     def get_link(self, path, method, view):
         """ Return a `coreapi.Link` instance for the given endpoint. """
-        fields = self.get_path_fields(path, method, view)
-        fields += self.get_serializer_fields(path, method, view)
-        fields += self.get_pagination_fields(path, method, view)
-        fields += self.get_filter_fields(path, method, view)
-        fields += self.get_docs_fields(path, method, view)
+        try:
+            fields = self.get_path_fields(path, method, view)
+        except:
+            pass
+        try:
+            fields += self.get_serializer_fields(path, method, view)
+        except:
+            pass
+        try:
+            fields += self.get_pagination_fields(path, method, view)
+        except:
+            pass
+        try:
+            fields += self.get_filter_fields(path, method, view)
+        except:
+            pass
+        try:
+            fields += self.get_docs_fields(path, method, view)
+        except:
+            pass
 
         if fields and any([field.location in ('form', 'body') for field in fields]):
             encoding = self.get_encoding(path, method, view)
