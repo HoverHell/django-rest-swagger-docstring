@@ -1,3 +1,7 @@
+# coding: utf8
+
+from __future__ import unicode_literals
+
 from django.utils.encoding import force_text
 from rest_framework import serializers
 from rest_framework.compat import (
@@ -53,9 +57,9 @@ class DocsSchemaGenerator(SchemaGenerator):
             encoding = None
 
         description = self.get_description(path, method, view)
-        permisions =self.get_permissions_docs(path, method, view)
-        if permisions is not None:
-            description = '{}\nPermisions:\n========\n{}'.format(description, permisions)
+        permissions = self.get_permissions_docs(path, method, view)
+        if permissions is not None:
+            description = "{}\nPermissions:\n========\n{}".format(description, permissions)
 
         if self.url and path.startswith('/'):
             path = path[1:]
