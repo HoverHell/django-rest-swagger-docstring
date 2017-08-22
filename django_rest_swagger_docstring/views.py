@@ -7,11 +7,11 @@ from rest_framework_swagger import renderers
 from .schemas import DocsSchemaGenerator
 
 
-def get_schema_view(title=None, url=None, renderer_classes=None):
+def get_schema_view(title=None, url=None, renderer_classes=None, generator_cls=DocsSchemaGenerator):
     """
     Return a schema view.
     """
-    generator = DocsSchemaGenerator(title=title, url=url)
+    generator = generator_cls(title=title, url=url)
     if renderer_classes is None:
         if renderers.BrowsableAPIRenderer in api_settings.DEFAULT_RENDERER_CLASSES:
             rclasses = [renderers.CoreJSONRenderer, renderers.BrowsableAPIRenderer]
@@ -34,7 +34,7 @@ def get_schema_view(title=None, url=None, renderer_classes=None):
     return SchemaView.as_view()
 
 
-def get_swagger_view(title=None, url=None):
+def get_swagger_view(title=None, url=None, **kwargs):
     """
     Returns schema view which renders Swagger/OpenAPI.
     """
@@ -44,5 +44,5 @@ def get_swagger_view(title=None, url=None):
         renderer_classes=[
             renderers.OpenAPIRenderer,
             renderers.SwaggerUIRenderer
-        ]
-    )
+        ],
+        **kwargs)
