@@ -28,6 +28,9 @@ types_lookup = ClassLookupDict({
 
 
 class DocsSchemaGenerator(SchemaGenerator):
+
+    parameters_parser_cls = YAMLDocstringParser
+
     def get_link(self, path, method, view):
         """ Return a `coreapi.Link` instance for the given endpoint. """
         fields = []
@@ -65,17 +68,21 @@ class DocsSchemaGenerator(SchemaGenerator):
         """ Return a `coreapi.Fields array` instance from docstrings """
         method_name = getattr(view, 'action', method.lower())
         method_docstring = getattr(view, method_name, None).__doc__
-        docs = str(method_docstring)
         if method_docstring is None:
             docs = view.get_view_description()
-        yaml_parser = YAMLDocstringParser(docs)
-        parameters = yaml_parser.get_parameters()
+        else:
+            docs = str(method_docstring)
+        parameters_parser = self.parameters_parser_cls(docs)
+        parameters = parameters_parser.get_parameters()
         coreapi_fields = []
         for parameter in parameters:
-            coreapi_fields.append(coreapi.Field(name=parameter.get('name'),
-                                                required=parameter.get('required'),
-                                                location=parameter.get('param_type'),
-                                                type=parameter.get('data_type')))
+            coreapi_fields.append(coreapi.Field(
+                name=parameter.get('name'),
+                required=parameter.get('required'),
+                location=parameter.get('param_type'),
+                type=parameter.get('data_type'),
+                description=parameter.get('description'),
+            ))
         return coreapi_fields
 
     def has_view_permissions(self, path, method, view):
@@ -139,3 +146,13 @@ class DocsSchemaGenerator(SchemaGenerator):
         if len(permissions_docs) > 0:
             return permissions_docs
         return None
+
+    def get_description(self, *args, **kwargs):
+        result = super(DocsSchemaGenerator, self).get_description(*args, **kwargs)
+        # Attempt to remove the parameters yaml from it.
+        # XXX: Not clear how it was ever supposed to work otherwise.
+        # WARN/XXX: `view.get_view_description()` result will also be processed with this.
+        base_result = result
+        result, _ = self.parameters_parser_cls.split_docstring(result)
+        result = result or base_result
+        return result

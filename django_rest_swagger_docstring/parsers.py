@@ -53,25 +53,37 @@ class YAMLDocstringParser(object):
                   'string',
                   'boolean', ]
 
-    SPLITTER = '---'
+    SPLITTER = "---"
 
     def __init__(self, docstring):
         self.object = self.create_yaml_object(docstring)
         if self.object is None:
             self.object = {}
 
+
+    @classmethod
+    def split_docstring(cls, docstring):
+        docstring = trim_docstring(docstring)
+
+        splitter_re = "^|\n{}".format(re.escape(cls.SPLITTER))
+        ptn = re.compile(splitter_re)
+        splitted = ptn.split(docstring, maxsplit=1)  # `rsplit` would be more useful though.
+
+        if len(splitted) != 2:
+            return None, None
+        return splitted
+
     def create_yaml_object(self, docstring):
         """Create YAML object from docstring"""
-        docstring = trim_docstring(docstring)
-        p = re.compile('^|\n{}'.format(YAMLDocstringParser.SPLITTER))
-        splitted = p.split(docstring)
-        if len(splitted) < 2:
+        base, yaml_string = self.split_docstring(docstring)
+        if not yaml_string:
             return None
-        yaml_string = splitted[1]
         yaml_string = formatting.dedent(yaml_string)
         try:
+            # Note that it's not `safe_load`. But docstrings shouldn't really
+            # have unsafe values, right?..
             return yaml.load(yaml_string)
-        except yaml.YAMLError as e:
+        except yaml.YAMLError:  # TODO: log?..
             return None
 
     def get_parameters(self):
