@@ -64,10 +64,13 @@ class DocsSchemaGenerator(SchemaGenerator):
             description=description
         )
 
+    def _get_method_method(self, path, method, view):
+        method_name = getattr(view, 'action', method.lower())
+        return getattr(view, method_name, None)
+
     def get_docs_fields(self, path, method, view):
         """ Return a `coreapi.Fields array` instance from docstrings """
-        method_name = getattr(view, 'action', method.lower())
-        method_docstring = getattr(view, method_name, None).__doc__
+        method_docstring = self._get_method_method(path, method, view).__doc__
         if method_docstring is None:
             docs = view.get_view_description()
         else:
@@ -93,13 +96,24 @@ class DocsSchemaGenerator(SchemaGenerator):
         Return a list of `coreapi.Field` instances corresponding to any
         request body input, as determined by the serializer class.
         """
-        if method not in ('PUT', 'PATCH', 'POST'):
-            return []
+        fields = []
 
-        if not hasattr(view, 'get_serializer'):
-            return []
+        if method not in ('PUT', 'PATCH', 'POST', 'DELETE'):
+            return fields
 
-        serializer = view.get_serializer()
+        serializer = None
+
+        method_method = self._get_method_method(path, method, view)
+        serializer_cls = getattr(method_method, '_serializer_class', None)
+        if serializer_cls is not None:
+            serializer = serializer_cls()
+
+        if serializer is None:
+            if hasattr(view, 'get_serializer'):
+                serializer = view.get_serializer()
+
+        if serializer is None:
+            return fields
 
         if isinstance(serializer, serializers.ListSerializer):
             return [
@@ -112,9 +126,8 @@ class DocsSchemaGenerator(SchemaGenerator):
             ]
 
         if not isinstance(serializer, serializers.Serializer):
-            return []
+            return fields
 
-        fields = []
         for field in serializer.fields.values():
             if field.read_only or isinstance(field, serializers.HiddenField):
                 continue
@@ -126,7 +139,9 @@ class DocsSchemaGenerator(SchemaGenerator):
                 location='form',
                 required=required,
                 description=description,
-                type=types_lookup[field]
+                type=types_lookup[field],
+                # example=field.default,
+                # schema=...
             )
             fields.append(field)
 
