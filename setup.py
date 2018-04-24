@@ -36,7 +36,7 @@ Docs @ https://django-rest-swagger-docstring.readthedocs.io/
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
-    name='django-rest-swagger-docstring',
+    name='django-rest-swagger-docstring-ext',
     version=VERSION,
     install_requires=[
         'coreapi>=2.0.8',
@@ -47,12 +47,12 @@ setup(
     packages=['django_rest_swagger_docstring'],
     include_package_data=True,
     license='MIT License',
-    description='Supports docstrings in Django Rest Swagger for versions >2.0',
+    description='Supports docstrings in Django Rest Swagger for versions >2.0 (extended version)',
     long_description=README,
     test_suite='tests',
-    author='Jan Romaniak',
-    author_email='romaniakjan@gmail.com',
-    url='https://github.com/johniak/django-rest-swagger-docstring',
+    author='HoverHell',
+    author_email='hoverhell@gmail.com',
+    url='https://github.com/HoverHell/django-rest-swagger-docstring',
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
